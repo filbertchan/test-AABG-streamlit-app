@@ -10,7 +10,7 @@ st.subheader("Direct upload to S3")
 # AWS credentials and bucket
 AWS_ACCESS_KEY = st.secrets["AWS_ACCESS_KEY_ID"]
 AWS_SECRET_KEY = st.secrets["AWS_SECRET_ACCESS_KEY"]
-AWS_REGION = "ap-southeast-1"   # change if needed
+AWS_REGION = "us-east-1"   # change if needed
 BUCKET_NAME = "aws-architect-agent-requirement"
 
 s3 = boto3.client(
