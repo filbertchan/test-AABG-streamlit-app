@@ -16,9 +16,6 @@ APP_CLIENT_SECRET = st.secrets["APP_CLIENT_SECRET"]
 AWS_REGION = "us-east-1"   # change if needed
 BUCKET_NAME = "aws-architect-agent-requirement"
 
-# Initialize session_state
-st.session_state["logged_in"] = False
-
 s3 = boto3.client(
     "s3",
     aws_access_key_id=AWS_ACCESS_KEY,
@@ -30,9 +27,9 @@ uploaded_file = st.file_uploader("Upload PDF, DOCX, or TXT file", type=["pdf", "
 
 if uploaded_file is not None:
     st.info(f"📁 Selected: {uploaded_file.name}")
-    st.toast("Checking if user is logged in")
-    if st.session_state["logged_in"] == False:
-        st.toast("NOT LOGGED IN")
+    username = st.text_input("Username")
+    password = st.text_input("Password", type="password")
+    if st.button("Login"):
         client = boto3.client("cognito-idp", region_name=AWS_REGION)
         try:
             response = client.initiate_auth(
