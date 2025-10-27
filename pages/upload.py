@@ -16,6 +16,9 @@ APP_CLIENT_SECRET = st.secrets["APP_CLIENT_SECRET"]
 AWS_REGION = "us-east-1"   # change if needed
 BUCKET_NAME = "aws-architect-agent-requirement"
 
+# Initialize session_state
+st.session_state["logged_in"] = False
+
 s3 = boto3.client(
     "s3",
     aws_access_key_id=AWS_ACCESS_KEY,
