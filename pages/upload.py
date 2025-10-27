@@ -20,6 +20,7 @@ LOGIN_URL = (
     f"&response_type=code&scope=email+openid&redirect_uri={REDIRECT_URI}"
 )
 
+st.toast("initialize session_state")
 # Initialize session state for login
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
@@ -28,7 +29,9 @@ if "id_token" not in st.session_state:
 
 # Check if Cognito redirected back with a code
 code = st.experimental_get_query_params().get("code")
+st.toast("check session_state")
 if code and not st.session_state.logged_in:
+    st.toast("not logged in")
     code = code[0]  # Get the actual code string
     # Exchange code for tokens
     data = {
@@ -49,6 +52,7 @@ if code and not st.session_state.logged_in:
         st.error(f"❌ Login failed: {e}")
 
 # Show login button if not logged in
+st.toast("not logged in") 
 if not st.session_state.logged_in:
     st.warning("Please log in with Cognito to upload files.")
     if st.button("Login with Cognito"):
