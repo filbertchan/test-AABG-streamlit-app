@@ -26,7 +26,7 @@ if uploaded_file is not None:
     st.info(f"📁 Selected: {uploaded_file.name}")
     if st.button("Upload to S3"):
         try:
-            s3.upload_fileobj(uploaded_file, BUCKET_NAME, f"uploads/{uploaded_file.name}")
+            s3.upload_fileobj(uploaded_file, BUCKET_NAME, f"documents/{uploaded_file.name}")
             st.success("✅ File uploaded successfully to S3!")
         except NoCredentialsError:
             st.error("❌ AWS credentials not found.")
