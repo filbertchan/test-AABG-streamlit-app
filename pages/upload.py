@@ -27,7 +27,9 @@ uploaded_file = st.file_uploader("Upload PDF, DOCX, or TXT file", type=["pdf", "
 
 if uploaded_file is not None:
     st.info(f"📁 Selected: {uploaded_file.name}")
+    st.toast("Checking if user is logged in")
     if st.session_state["logged_in"] == False:
+        st.toast("NOT LOGGED IN")
         client = boto3.client("cognito-idp", region_name=AWS_REGION)
         try:
             response = client.initiate_auth(
