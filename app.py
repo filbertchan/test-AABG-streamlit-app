@@ -8,7 +8,7 @@ st.write("Welcome to the **Prompt Squad** web app — your portal for secure fil
 st.sidebar.success("Select a page above to get started.")
 
 # Cognito login URL (replace with your actual Cognito Hosted UI URL)
-cognito_login_url = "https://YOUR_COGNITO_DOMAIN.auth.REGION.amazoncognito.com/login?client_id=YOUR_CLIENT_ID&response_type=code&scope=email+openid&redirect_uri=YOUR_REDIRECT_URI"
+cognito_login_url = "https://us-east-1qitbxlp6m.auth.us-east-1.amazoncognito.com/login?client_id=45hcn8a97al4j4hmmdhgsgvtvf&response_type=code&scope=email+openid+phone&redirect_uri=https%3A%2F%2Ftest-aabg-app-app-3ef6mcdpuz6vyz4pbyfd8k.streamlit.app%2Fupload"
 
 if st.button("Login with Cognito"):
     st.write(f"Click [here to login]({cognito_login_url})")  # Provides a clickable link
