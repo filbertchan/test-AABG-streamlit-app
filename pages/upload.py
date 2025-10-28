@@ -11,14 +11,17 @@ st.subheader("Direct upload to S3")
 # ----------------------
 # Cognito login setup
 # ----------------------
-COGNITO_DOMAIN = "https://us-east-1qitbxlp6m.auth.us-east-1.amazoncognito.com/login?client_id=45hcn8a97al4j4hmmdhgsgvtvf&response_type=code&scope=email+openid+phone&redirect_uri=https%3A%2F%2Ftest-aabg-app-app-3ef6mcdpuz6vyz4pbyfd8k.streamlit.app%2Fupload"
-CLIENT_ID =  st.secrets["APP_CLIENT_ID"] 
-REDIRECT_URI = "https://test-aabg-app-app-3ef6mcdpuz6vyz4pbyfd8k.streamlit.app/upload?code=db27002a-68f8-490b-8823-fce79e18501a"
-TOKEN_URL = f"https://{COGNITO_DOMAIN}/oauth2/token"
+COGNITO_DOMAIN = "https://us-east-1qitbxlp6m.auth.us-east-1.amazoncognito.com"
+CLIENT_ID =  st.secrets["APP_CLIENT_ID"]
+REDIRECT_URI = "https://acn-solutions-architect-agent-webapp.streamlit.app/upload"
+TOKEN_URL = f"{COGNITO_DOMAIN}/oauth2/token"
+
 LOGIN_URL = (
-    f"https://{COGNITO_DOMAIN}/login?client_id={CLIENT_ID}"
+    f"{COGNITO_DOMAIN}/login?client_id={CLIENT_ID}"
     f"&response_type=code&scope=email+openid&redirect_uri={REDIRECT_URI}"
 )
+
+#LOGIN_URL = f"https://us-east-1qitbxlp6m.auth.us-east-1.amazoncognito.com/login/continue?client_id={CLIENT_ID}&redirect_uri=https%3A%2F%2Facn-solutions-architect-agent-webapp.streamlit.app%2Fupload&response_type=code&scope=email+openid+phone)%22%3E%27"
 
 st.toast("initialize session_state")
 # Initialize session state for login
@@ -28,7 +31,7 @@ if "id_token" not in st.session_state:
     st.session_state.id_token = None
 
 # Check if Cognito redirected back with a code
-code = st.experimental_get_query_params().get("code")
+code = st.query_params.get("code")
 st.toast("check session_state")
 if code and not st.session_state.logged_in:
     st.toast("not logged in")
