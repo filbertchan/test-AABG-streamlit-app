@@ -71,13 +71,14 @@ if code and not st.session_state.logged_in:
 st.toast("not logged in") 
 if not st.session_state.logged_in:
     st.warning("Please log in with Cognito to upload files.")
-    st.markdown(
-        f'<a href="{LOGIN_URL}" target="_top">'
-        '<button style="padding:8px 16px; background-color:#4CAF50; color:white; '
-        'border:none; border-radius:4px;">Login with Cognito</button></a>',
-        unsafe_allow_html=True
-    )
+    st.markdown(f"""
+        <button onclick="window.top.location.href='{LOGIN_URL}'" 
+            style="padding:8px 16px; background-color:#4CAF50; color:white; border:none; border-radius:4px;">
+            Login with Cognito
+        </button>
+    """, unsafe_allow_html=True)
     st.stop()
+
 
 
 
