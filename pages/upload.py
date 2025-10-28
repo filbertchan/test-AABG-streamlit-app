@@ -23,6 +23,16 @@ LOGIN_URL = (
 
 #LOGIN_URL = f"https://us-east-1qitbxlp6m.auth.us-east-1.amazoncognito.com/login/continue?client_id={CLIENT_ID}&redirect_uri=https%3A%2F%2Facn-solutions-architect-agent-webapp.streamlit.app%2Fupload&response_type=code&scope=email+openid+phone)%22%3E%27"
 
+LOGIN_URL = (
+    "https://us-east-1qitbxlp6m.auth.us-east-1.amazoncognito.com/login/continue"
+    "?client_id=45hcn8a97al4j4hmmdhgsgvtvf"
+    "&redirect_uri=https%3A%2F%2Ftest-aabg-app-app-ubaxx4rffpfjc96ed39swa.streamlit.app%2Fupload"
+    "&response_type=code"
+    "&scope=email+openid"
+)
+
+
+
 st.toast("initialize session_state")
 # Initialize session state for login
 if "logged_in" not in st.session_state:
