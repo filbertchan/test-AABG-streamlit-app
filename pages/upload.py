@@ -15,11 +15,11 @@ st.subheader("Direct upload to S3")
 # ----------------------
 COGNITO_DOMAIN = "https://us-east-1qitbxlp6m.auth.us-east-1.amazoncognito.com"
 CLIENT_ID = st.secrets["APP_CLIENT_ID"]
-CLIENT_SECRET = st.secrets["APP_CLIENT_SECRET"]
+CLIENT_SECRET = st.secrets.get("APP_CLIENT_SECRET")  # optional, may not exist
 REDIRECT_URI = "https://test-aabg-app-app-ubaxx4rffpfjc96ed39swa.streamlit.app/upload"
 TOKEN_URL = f"{COGNITO_DOMAIN}/oauth2/token"
 
-# URL-encode redirect URI for login URL
+# URL-encode redirect URI for login link
 encoded_redirect = urllib.parse.quote(REDIRECT_URI, safe='')
 
 LOGIN_URL = (
@@ -36,24 +36,36 @@ if "id_token" not in st.session_state:
     st.session_state.id_token = None
 
 # ----------------------
-# Handle Cognito redirect with code
+# Handle Cognito redirect with authorization code
 # ----------------------
-code = st.query_params.get("code")
-if code and not st.session_state.logged_in:
-    code = code[0]  # get the code string
+code_param = st.query_params.get("code")
+if code_param and not st.session_state.logged_in:
+    code = code_param[0]  # extract the code string
+
     data = {
         "grant_type": "authorization_code",
         "code": code,
         "redirect_uri": REDIRECT_URI,
+        "client_id": CLIENT_ID,  # required even if using secret
     }
+
     headers = {"Content-Type": "application/x-www-form-urlencoded"}
+
     try:
-        response = requests.post(
-            TOKEN_URL,
-            data=data,
-            headers=headers,
-            auth=HTTPBasicAuth(CLIENT_ID, CLIENT_SECRET)
-        )
+        if CLIENT_SECRET:  # app client has a secret
+            response = requests.post(
+                TOKEN_URL,
+                data=data,
+                headers=headers,
+                auth=HTTPBasicAuth(CLIENT_ID, CLIENT_SECRET)
+            )
+        else:  # no client secret
+            response = requests.post(
+                TOKEN_URL,
+                data=data,
+                headers=headers
+            )
+
         response.raise_for_status()
         tokens = response.json()
         st.session_state.logged_in = True
