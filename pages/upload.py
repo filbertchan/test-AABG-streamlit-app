@@ -3,10 +3,8 @@ import boto3
 from botocore.exceptions import NoCredentialsError
 import requests
 from requests.auth import HTTPBasicAuth
-import urllib.parse
 
 st.set_page_config(page_title="Prompt Squad Uploader", page_icon="🚀")
-
 st.title("🚀 Prompt Squad Document Uploader")
 st.subheader("Direct upload to S3")
 
@@ -14,58 +12,38 @@ st.subheader("Direct upload to S3")
 # Cognito login setup
 # ----------------------
 COGNITO_DOMAIN = "https://us-east-1qitbxlp6m.auth.us-east-1.amazoncognito.com"
-CLIENT_ID = "45hcn8a97al4j4hmmdhgsgvtvf"#st.secrets["APP_CLIENT_ID"]
-CLIENT_SECRET = "1e90l7hoohs3kge8tdtfd9e7ro363jvhkgs0qb1nkfca00mm0s64"#st.secrets.get("APP_CLIENT_SECRET")  # optional, may not exist
+CLIENT_ID = st.secrets["APP_CLIENT_ID"]
+CLIENT_SECRET = st.secrets["APP_CLIENT_SECRET"]
 REDIRECT_URI = "https://test-aabg-app-app-ubaxx4rffpfjc96ed39swa.streamlit.app/upload"
 TOKEN_URL = f"{COGNITO_DOMAIN}/oauth2/token"
-
-# URL-encode redirect URI for login link
-encoded_redirect = urllib.parse.quote(REDIRECT_URI, safe='')
-
 LOGIN_URL = (
-    f"{COGNITO_DOMAIN}/login?client_id={CLIENT_ID}"
-    f"&response_type=code&scope=email+openid&redirect_uri={encoded_redirect}"
+    f"{COGNITO_DOMAIN}/login/continue?client_id={CLIENT_ID}"
+    f"&response_type=code&scope=email+openid&redirect_uri={REDIRECT_URI}"
 )
 
-# ----------------------
 # Initialize session state
-# ----------------------
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 if "id_token" not in st.session_state:
     st.session_state.id_token = None
 
-# ----------------------
-# Handle Cognito redirect with authorization code
-# ----------------------
-code_param = st.query_params.get("code")
-if code_param and not st.session_state.logged_in:
-    code = code_param[0]  # extract the code string
-
+# Check if Cognito redirected back with a code
+code = st.experimental_get_query_params().get("code")
+if code and not st.session_state.logged_in:
+    code = code[0]
     data = {
         "grant_type": "authorization_code",
         "code": code,
-        "redirect_uri": REDIRECT_URI,
-        "client_id": CLIENT_ID,  # required even if using secret
+        "redirect_uri": REDIRECT_URI
     }
-
     headers = {"Content-Type": "application/x-www-form-urlencoded"}
-
     try:
-        if CLIENT_SECRET:  # app client has a secret
-            response = requests.post(
-                TOKEN_URL,
-                data=data,
-                headers=headers,
-                auth=HTTPBasicAuth(CLIENT_ID, CLIENT_SECRET)
-            )
-        else:  # no client secret
-            response = requests.post(
-                TOKEN_URL,
-                data=data,
-                headers=headers
-            )
-
+        response = requests.post(
+            TOKEN_URL,
+            data=data,
+            headers=headers,
+            auth=HTTPBasicAuth(CLIENT_ID, CLIENT_SECRET)
+        )
         response.raise_for_status()
         tokens = response.json()
         st.session_state.logged_in = True
@@ -74,9 +52,7 @@ if code_param and not st.session_state.logged_in:
     except Exception as e:
         st.error(f"❌ Login failed: {e}")
 
-# ----------------------
-# Show login link if not logged in
-# ----------------------
+# Show login button if not logged in
 if not st.session_state.logged_in:
     st.warning("Please log in with Cognito to upload files.")
     st.markdown(f"[Login to Cognito]({LOGIN_URL})", unsafe_allow_html=True)
@@ -98,7 +74,6 @@ s3 = boto3.client(
 )
 
 uploaded_file = st.file_uploader("Upload PDF, DOCX, or TXT file", type=["pdf", "docx", "txt"])
-
 if uploaded_file:
     st.info(f"📁 Selected: {uploaded_file.name}")
     if st.button("Upload to S3"):
@@ -109,5 +84,3 @@ if uploaded_file:
             st.error("❌ AWS credentials not found.")
         except Exception as e:
             st.error(f"❌ Upload failed: {e}")
-
-st.markdown("---")
