@@ -14,8 +14,8 @@ st.subheader("Direct upload to S3")
 # Cognito login setup
 # ----------------------
 COGNITO_DOMAIN = "https://us-east-1qitbxlp6m.auth.us-east-1.amazoncognito.com"
-CLIENT_ID = st.secrets["APP_CLIENT_ID"]
-CLIENT_SECRET = st.secrets.get("APP_CLIENT_SECRET")  # optional, may not exist
+CLIENT_ID = "45hcn8a97al4j4hmmdhgsgvtvf"#st.secrets["APP_CLIENT_ID"]
+CLIENT_SECRET = "1e90l7hoohs3kge8tdtfd9e7ro363jvhkgs0qb1nkfca00mm0s64"#st.secrets.get("APP_CLIENT_SECRET")  # optional, may not exist
 REDIRECT_URI = "https://test-aabg-app-app-ubaxx4rffpfjc96ed39swa.streamlit.app/upload"
 TOKEN_URL = f"{COGNITO_DOMAIN}/oauth2/token"
 
