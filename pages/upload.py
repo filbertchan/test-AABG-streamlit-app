@@ -2,6 +2,7 @@ import streamlit as st
 import boto3
 from botocore.exceptions import NoCredentialsError
 import requests
+import base64
 
 st.set_page_config(page_title="Prompt Squad Uploader", page_icon="🚀")
 
@@ -13,6 +14,7 @@ st.subheader("Direct upload to S3")
 # ----------------------
 COGNITO_DOMAIN = "https://us-east-1qitbxlp6m.auth.us-east-1.amazoncognito.com"
 CLIENT_ID =  st.secrets["APP_CLIENT_ID"]
+CLIENT_SECRET = st.secrets["APP_CLIENT_SECRET"]
 REDIRECT_URI = "https://acn-solutions-architect-agent-webapp.streamlit.app/upload"
 TOKEN_URL = f"{COGNITO_DOMAIN}/oauth2/token"
 
@@ -20,6 +22,8 @@ LOGIN_URL = (
     f"{COGNITO_DOMAIN}/login?client_id={CLIENT_ID}"
     f"&response_type=code&scope=email+openid&redirect_uri={REDIRECT_URI}"
 )
+
+auth_header = base64.b64encode(f"{CLIENT_ID}:{CLIENT_SECRET}".encode()).decode()
 
 #LOGIN_URL = f"https://us-east-1qitbxlp6m.auth.us-east-1.amazoncognito.com/login/continue?client_id={CLIENT_ID}&redirect_uri=https%3A%2F%2Facn-solutions-architect-agent-webapp.streamlit.app%2Fupload&response_type=code&scope=email+openid+phone)%22%3E%27"
 
@@ -38,19 +42,26 @@ if code and not st.session_state.logged_in:
     code = code[0]  # Get the actual code string
     # Exchange code for tokens
     data = {
-        "grant_type": "authorization_code",
-        "client_id": CLIENT_ID,
-        "code": code,
-        "redirect_uri": REDIRECT_URI
+    "grant_type": "authorization_code",
+    "client_id": CLIENT_ID,
+    "code": code,
+    "redirect_uri": REDIRECT_URI
     }
-    headers = {"Content-Type": "application/x-www-form-urlencoded"}
+    
+    headers = {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Authorization": f"Basic {auth_header}"
+    }
+    
     try:
         response = requests.post(TOKEN_URL, data=data, headers=headers)
-        response.raise_for_status()
-        tokens = response.json()
-        st.session_state.logged_in = True
-        st.session_state.id_token = tokens["id_token"]
-        st.success("✅ Logged in successfully via Cognito!")
+        if response.status_code != 200:
+            st.error(f"❌ Login failed: {response.status_code} - {response.text}")
+        else:
+            tokens = response.json()
+            st.session_state.logged_in = True
+            st.session_state.id_token = tokens["id_token"]
+            st.success("✅ Logged in successfully via Cognito!")
     except Exception as e:
         st.error(f"❌ Login failed: {e}")
 
