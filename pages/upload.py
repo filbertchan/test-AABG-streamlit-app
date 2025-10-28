@@ -2,6 +2,7 @@ import streamlit as st
 import boto3
 from botocore.exceptions import NoCredentialsError
 import requests
+from requests.auth import HTTPBasicAuth
 
 st.set_page_config(page_title="Prompt Squad Uploader", page_icon="🚀")
 
