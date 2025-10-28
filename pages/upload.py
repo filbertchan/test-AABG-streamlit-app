@@ -71,9 +71,13 @@ if code and not st.session_state.logged_in:
 st.toast("not logged in") 
 if not st.session_state.logged_in:
     st.warning("Please log in with Cognito to upload files.")
-    if st.button("Login with Cognito"):
-        st.markdown(f'<meta http-equiv="refresh" content="0; url={LOGIN_URL}">', unsafe_allow_html=True)
-    st.stop()  # Stop the rest of the app until login
+    st.markdown(
+        f'<a href="{LOGIN_URL}" target="_self">'
+        '<button style="background-color:#4CAF50;color:white;padding:8px 16px;border:none;border-radius:4px;">'
+        'Login with Cognito</button></a>',
+        unsafe_allow_html=True
+    )
+    st.stop()
 
 # ----------------------
 # AWS S3 upload
