@@ -11,9 +11,9 @@ cognito_url = (
     "&scope=email+openid"
 )
 
-if st.button("Login to Cognito"):
-    st.components.v1.html(f"""
-        <script>
-            window.location.href = "{cognito_url}";
-        </script>
-    """, height=0)
+# Create a link styled as a button that opens in the same tab
+st.markdown(
+    f'<a href="{cognito_url}" target="_self" style="text-decoration:none;">'
+    f'<button style="padding:10px 20px; font-size:16px;">Login to Cognito</button></a>',
+    unsafe_allow_html=True
+)
