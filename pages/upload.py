@@ -28,7 +28,7 @@ if "id_token" not in st.session_state:
     st.session_state.id_token = None
 
 # Check if Cognito redirected back with a code
-code = st.experimental_get_query_params().get("code")
+code = st.query_params.get("code")
 if code and not st.session_state.logged_in:
     code = code[0]
     data = {
