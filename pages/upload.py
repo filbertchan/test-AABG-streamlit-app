@@ -12,7 +12,7 @@ st.subheader("Direct upload to S3")
 # ----------------------
 # Cognito login setup
 # ----------------------
-COGNITO_DOMAIN = "https://qitbxlp6m.auth.us-east-1.amazoncognito.com"
+COGNITO_DOMAIN = "https://us-east-1qitbxlp6m.auth.us-east-1.amazoncognito.com"
 CLIENT_ID =  st.secrets["APP_CLIENT_ID"]
 CLIENT_SECRET = st.secrets["APP_CLIENT_SECRET"]
 REDIRECT_URI = "https://test-aabg-app-app-ubaxx4rffpfjc96ed39swa.streamlit.app/upload"
