@@ -3,6 +3,7 @@ import boto3
 from botocore.exceptions import NoCredentialsError
 import requests
 import base64
+from urllib.parse import urlencode
 
 st.set_page_config(page_title="Prompt Squad Uploader", page_icon="🚀")
 
@@ -13,48 +14,45 @@ st.subheader("Direct upload to S3")
 # Cognito login setup
 # ----------------------
 COGNITO_DOMAIN = "https://us-east-1qitbxlp6m.auth.us-east-1.amazoncognito.com"
-CLIENT_ID =  st.secrets["APP_CLIENT_ID"]
+CLIENT_ID = st.secrets["APP_CLIENT_ID"]
 CLIENT_SECRET = st.secrets["APP_CLIENT_SECRET"]
 REDIRECT_URI = "https://test-aabg-app-app-ubaxx4rffpfjc96ed39swa.streamlit.app/upload"
 TOKEN_URL = f"{COGNITO_DOMAIN}/oauth2/token"
 
-a = """LOGIN_URL = (
-    f"{COGNITO_DOMAIN}/login?client_id={CLIENT_ID}"
-    f"&response_type=code&scope=email+openid&redirect_uri={REDIRECT_URI}"
-)"""
-
-LOGIN_URL = "https://us-east-1qitbxlp6m.auth.us-east-1.amazoncognito.com/login/continue?client_id=45hcn8a97al4j4hmmdhgsgvtvf&redirect_uri=https%3A%2F%2Ftest-aabg-app-app-ubaxx4rffpfjc96ed39swa.streamlit.app%2Fupload&response_type=code&scope=email+openid"
-
+# Encode client_id:client_secret for Basic Auth
 auth_header = base64.b64encode(f"{CLIENT_ID}:{CLIENT_SECRET}".encode()).decode()
 
-#LOGIN_URL = f"https://us-east-1qitbxlp6m.auth.us-east-1.amazoncognito.com/login/continue?client_id={CLIENT_ID}&redirect_uri=https%3A%2F%2Facn-solutions-architect-agent-webapp.streamlit.app%2Fupload&response_type=code&scope=email+openid+phone)%22%3E%27"
+# Construct LOGIN_URL
+login_params = {
+    "client_id": CLIENT_ID,
+    "response_type": "code",
+    "scope": "email openid",
+    "redirect_uri": REDIRECT_URI
+}
+LOGIN_URL = f"{COGNITO_DOMAIN}/login/continue?{urlencode(login_params)}"
 
-st.toast("initialize session_state")
-# Initialize session state for login
+# Initialize session state
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 if "id_token" not in st.session_state:
     st.session_state.id_token = None
 
-# Check if Cognito redirected back with a code
+# ----------------------
+# Handle Cognito redirect with code
+# ----------------------
 code = st.query_params.get("code")
-st.toast("check session_state")
 if code and not st.session_state.logged_in:
-    st.toast("not logged in")
-    code = code[0]  # Get the actual code string
-    # Exchange code for tokens
+    code = code[0]  # extract the code string
     data = {
-    "grant_type": "authorization_code",
-    "client_id": CLIENT_ID,
-    "code": code,
-    "redirect_uri": REDIRECT_URI
+        "grant_type": "authorization_code",
+        "client_id": CLIENT_ID,
+        "code": code,
+        "redirect_uri": REDIRECT_URI
     }
-    
     headers = {
         "Content-Type": "application/x-www-form-urlencoded",
         "Authorization": f"Basic {auth_header}"
     }
-    
     try:
         response = requests.post(TOKEN_URL, data=data, headers=headers)
         if response.status_code != 200:
@@ -64,23 +62,23 @@ if code and not st.session_state.logged_in:
             st.session_state.logged_in = True
             st.session_state.id_token = tokens["id_token"]
             st.success("✅ Logged in successfully via Cognito!")
+            st.experimental_set_query_params()  # remove ?code from URL
     except Exception as e:
         st.error(f"❌ Login failed: {e}")
 
+# ----------------------
 # Show login button if not logged in
-st.toast("not logged in") 
+# ----------------------
 if not st.session_state.logged_in:
     st.warning("Please log in with Cognito to upload files.")
-    st.markdown(f"""
-        <button onclick="window.top.location.href='{LOGIN_URL}'" 
-            style="padding:8px 16px; background-color:#4CAF50; color:white; border:none; border-radius:4px;">
-            Login with Cognito
-        </button>
-    """, unsafe_allow_html=True)
+    # Option 1: clickable link styled as a button (works reliably on Streamlit Cloud)
+    st.markdown(
+        f'<a href="{LOGIN_URL}" target="_top" '
+        'style="display:inline-block; padding:8px 16px; background-color:#4CAF50; color:white; '
+        'text-decoration:none; border-radius:4px;">Login with Cognito</a>',
+        unsafe_allow_html=True
+    )
     st.stop()
-
-
-
 
 # ----------------------
 # AWS S3 upload
