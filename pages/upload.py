@@ -68,7 +68,7 @@ if code and not st.session_state.logged_in:
 st.toast("not logged in") 
 if not st.session_state.logged_in:
     st.warning("Please log in with Cognito to upload files.")
-    st.markdown(f"[Login to Cognito]({cognito_url})", unsafe_allow_html=True)
+    st.markdown(f"[Login to Cognito]({LOGIN_URL})", unsafe_allow_html=True)
     st.stop()  # Stop the rest of the app until login
 
 # ----------------------
