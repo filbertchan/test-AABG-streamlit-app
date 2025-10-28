@@ -18,10 +18,12 @@ CLIENT_SECRET = st.secrets["APP_CLIENT_SECRET"]
 REDIRECT_URI = "https://test-aabg-app-app-ubaxx4rffpfjc96ed39swa.streamlit.app/upload"
 TOKEN_URL = f"{COGNITO_DOMAIN}/oauth2/token"
 
-LOGIN_URL = (
+a = """LOGIN_URL = (
     f"{COGNITO_DOMAIN}/login?client_id={CLIENT_ID}"
     f"&response_type=code&scope=email+openid&redirect_uri={REDIRECT_URI}"
-)
+)"""
+
+LOGIN_URL = "https://us-east-1qitbxlp6m.auth.us-east-1.amazoncognito.com/login/continue?client_id=45hcn8a97al4j4hmmdhgsgvtvf&redirect_uri=https%3A%2F%2Ftest-aabg-app-app-ubaxx4rffpfjc96ed39swa.streamlit.app%2Fupload&response_type=code&scope=email+openid"
 
 auth_header = base64.b64encode(f"{CLIENT_ID}:{CLIENT_SECRET}".encode()).decode()
 
