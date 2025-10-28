@@ -11,9 +11,7 @@ cognito_url = (
     "&scope=email+openid"
 )
 
-# Create a link styled as a button that opens in the same tab
 st.markdown(
-    f'<a href="{cognito_url}" target="_self" style="text-decoration:none;">'
-    f'<button style="padding:10px 20px; font-size:16px;">Login to Cognito</button></a>',
+    f"[Login to Cognito]({cognito_url})",
     unsafe_allow_html=True
 )
